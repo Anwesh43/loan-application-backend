@@ -1,17 +1,17 @@
 package daos
 
 type InitiateResponseDao struct {
-	ApplicationId string
+	ApplicationId string `json:"applicationId"`
 }
 
 type BalanceSheetResponseDao struct {
-	Year          string
-	Month         int
-	ProfitsOrLoss int
-	AssetsValue   int
+	Year          string `json:"year"`
+	Month         int    `json:"month"`
+	ProfitsOrLoss int    `json:"profitsOrLoss"`
+	AssetsValue   int    `json:"assetsValue"`
 }
 
 type SubmissionDao struct {
-	Status  bool
-	Message string
+	Status  bool   `json:"status"`
+	Message string `json:"message"`
 }
