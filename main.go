@@ -10,11 +10,12 @@ import (
 
 func main() {
 	r := gin.Default()
-	routeHandler := routes.NewRouteHandler()
+	helpers.LoadEnv()
+	db, err := helpers.ConnectToDb()
+	routeHandler := routes.NewRouteHandler(db)
 	routeHandler.PopulateRouteMap()
 	routeHandler.InitiateRoutes(r)
-	helpers.LoadEnv()
-	_, err := helpers.ConnectToDb()
+
 	if err == nil {
 		log.Println("Connected to database")
 	}

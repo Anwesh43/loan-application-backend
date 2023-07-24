@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"fmt"
+
 	"com.loan.demo/daos"
 	"com.loan.demo/services"
 	"com.loan.demo/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type ILoanApplicationController interface {
@@ -16,21 +19,25 @@ type ILoanApplicationController interface {
 type LoanApplicationController struct {
 	balanceSheetService   services.IBalanceSheetService
 	decisionEngineService services.IDecisionEngineService
+	applicationService    services.IApplicationService
 }
 
 func (lc LoanApplicationController) IntiateApplication(c *gin.Context) {
+	var request daos.InitiateApplicationRequest
+	c.BindJSON(&request)
+	fmt.Println("Name", request.Name, "Year", request.YearEstablished, "Provider", request.Provider)
+	id := lc.applicationService.CreateApplication(request)
+
 	c.JSON(200, utils.JsonifyStruct(daos.InitiateResponseDao{
-		ApplicationId: "application1",
+		ApplicationId: fmt.Sprintf("application_%d", id),
 	}))
 }
 
 func (lc LoanApplicationController) FetchBalanceSheet(c *gin.Context) {
-	c.JSON(200, utils.JsonifyStruct(daos.BalanceSheetResponseDao{
-		Year:          "2020",
-		Month:         10,
-		ProfitsOrLoss: 1150,
-		AssetsValue:   1234,
-	}))
+	var request daos.FetchBalanceSheetRequest
+	c.BindQuery(&request)
+	fmt.Println("REQUEST", request.Name, request.Year)
+	c.JSON(200, utils.ArrayResponse(lc.balanceSheetService.GetBalanceSheet(request)))
 }
 
 func (lc LoanApplicationController) Submit(c *gin.Context) {
@@ -40,9 +47,10 @@ func (lc LoanApplicationController) Submit(c *gin.Context) {
 	}))
 }
 
-func NewLoanApplicationController(balanceSheetUrl string, decisionEngineUrl string) ILoanApplicationController {
+func NewLoanApplicationController(balanceSheetUrl string, decisionEngineUrl string, db *gorm.DB) ILoanApplicationController {
 	return LoanApplicationController{
 		balanceSheetService:   services.NewBalanceSheetService(balanceSheetUrl),
 		decisionEngineService: services.NewDecsionEngineService(decisionEngineUrl),
+		applicationService:    services.NewApplicationService(db),
 	}
 }

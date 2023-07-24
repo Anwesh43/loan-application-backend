@@ -3,6 +3,7 @@ package routes
 import (
 	"com.loan.demo/controllers"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type IRouteHandler interface {
@@ -46,9 +47,9 @@ func (r LoanRouteHandler) InitiateRoutes(g *gin.Engine) {
 	}
 }
 
-func NewRouteHandler() IRouteHandler {
+func NewRouteHandler(db *gorm.DB) IRouteHandler {
 	return LoanRouteHandler{
 		routeMaps:  make(map[string]Route),
-		controller: controllers.NewLoanApplicationController("", ""),
+		controller: controllers.NewLoanApplicationController("", "", db),
 	}
 }

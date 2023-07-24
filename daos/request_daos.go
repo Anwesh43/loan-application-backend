@@ -3,11 +3,12 @@ package daos
 type InitiateApplicationRequest struct {
 	Name            string `json:"name"`
 	YearEstablished string `json:"year_established"`
+	Provider        string `json:"provider"`
 }
 
 type FetchBalanceSheetRequest struct {
-	Name string `json:"name"`
-	Year string `json:"year"`
+	Name string `form:"name"`
+	Year string `form:"year"`
 }
 
 type SubmitApplicationRequest struct {

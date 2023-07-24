@@ -3,6 +3,7 @@ package helpers
 import (
 	"os"
 
+	"com.loan.demo/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -12,5 +13,6 @@ func ConnectToDb() (*gorm.DB, error) {
 	if err != nil {
 		return &gorm.DB{}, err
 	}
+	db.AutoMigrate(&models.Application{}, &models.AccountingSoftware{}, &models.ApplicationSummary{})
 	return db, nil
 }
