@@ -1,7 +1,7 @@
 package daos
 
 type InitiateResponseDao struct {
-	ApplicationId string `json:"applicationId"`
+	ApplicationId int `json:"applicationId"`
 }
 
 type BalanceSheetResponseDao struct {

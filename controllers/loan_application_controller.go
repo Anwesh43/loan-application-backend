@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"com.loan.demo/daos"
+	"com.loan.demo/helpers"
 	"com.loan.demo/services"
 	"com.loan.demo/utils"
 	"github.com/gin-gonic/gin"
@@ -29,7 +30,7 @@ func (lc LoanApplicationController) IntiateApplication(c *gin.Context) {
 	id := lc.applicationService.CreateApplication(request)
 
 	c.JSON(200, utils.JsonifyStruct(daos.InitiateResponseDao{
-		ApplicationId: fmt.Sprintf("application_%d", id),
+		ApplicationId: id,
 	}))
 }
 
@@ -41,9 +42,14 @@ func (lc LoanApplicationController) FetchBalanceSheet(c *gin.Context) {
 }
 
 func (lc LoanApplicationController) Submit(c *gin.Context) {
+	var request daos.SubmitApplicationRequest
+	c.BindJSON(&request)
+	applicationSummary := lc.applicationService.SummariseApplication(request.ApplicationId, request.ProfitLossInLastYear, request.AverageAssetValue)
+	decisionEngineOutput := helpers.ApplyRules(applicationSummary, request.Name, request.YearEstablished, request.LoanAmount)
+	status, message := lc.decisionEngineService.CheckEligibility(decisionEngineOutput)
 	c.JSON(200, utils.JsonifyStruct(daos.SubmissionDao{
-		Status:  true,
-		Message: "Submitted Successfully",
+		Status:  status,
+		Message: message,
 	}))
 }
 

@@ -9,6 +9,7 @@ import (
 type IApplicationService interface {
 	CreateApplication(daos.InitiateApplicationRequest) int
 	FetchApplications() []models.Application
+	SummariseApplication(int, int, int) models.ApplicationSummary
 }
 
 type ApplicationService struct {
@@ -30,6 +31,18 @@ func (applicationService ApplicationService) FetchApplications() []models.Applic
 	applications := make([]models.Application, 0)
 	applicationService.db.Find(&applications)
 	return applications
+}
+
+func (applicationService ApplicationService) SummariseApplication(applicationId int, pl int, assetValue int) models.ApplicationSummary {
+	application := models.Application{Id: applicationId}
+	applicationService.db.First(&application)
+	applicationSummary := models.ApplicationSummary{
+		PLInLastYear:      pl,
+		AverageAssetValue: assetValue,
+		CurrApplication:   application,
+	}
+	applicationService.db.Create(&applicationSummary)
+	return applicationSummary
 }
 
 func NewApplicationService(db *gorm.DB) IApplicationService {
